@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flinox-ksqldb-server
+  namespace: flinox-ksqldb-server
+  annotations:
+    kubernetes.io/change-cause: "Release: flinoxacrhml.azurecr.io/flinox_ksqldb:#{Build.BuildNumber}#"
+  labels:
+    app: flinox-ksqldb-server
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: flinox-ksqldb-server
+  template:
+    metadata:
+      labels:
+        app: flinox-ksqldb-server
+    spec:
+      containers:
+      - name: flinox-ksqldb-server
+        image: flinoxacrhml.azurecr.io/flinox_ksqldb:#{Build.BuildNumber}#
+        volumeMounts:
+          - name: cfg-properties
+            mountPath: "/etc/ksqldb"
+            readOnly: true
+        ports:
+        - containerPort: 8088
+        envFrom:
+        - secretRef:
+            name: flinox-ksqldb-server   
+        env:
+        - name: advertised.listener
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+      volumes:
+        - name: cfg-properties
+          configMap:
+            name: cfg-flinox-ksqldb-server
