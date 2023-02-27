@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cfg-flinox-ksqldb-server
+  namespace: flinox-ksqldb-server
+data:
+  ksqldb-server.properties: |
+    ksql.logging.processing.topic.replication.factor=3
+    sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="#{KC-KC-KEY}#" password="#{KC-KC-SECRET}#";
+    ksql.internal.topic.replicas=3
+    bootstrap.servers=#{KC-URL}#
+    ksql.logging.processing.topic.auto.create=false
+    ksql.sink.replicas=3
+    sasl.mechanism=PLAIN
+    listeners=http://0.0.0.0:8088
+    ksql.streams.replication.factor=3
+    ksql.logging.processing.stream.auto.create=false
+    security.protocol=SASL_SSL
+    ksql.schema.registry.basic.auth.credentials.source=USER_INFO
+    ksql.schema.registry.basic.auth.user.info=#{SR-KC-KEY}#:#{SR-KC-SECRET}#
+    ksql.schema.registry.url=#{SR-URL}#
+    ksql.server.command.response.timeout.ms=15000
